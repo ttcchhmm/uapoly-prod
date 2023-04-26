@@ -1,0 +1,45 @@
+version: '3'
+services:
+
+  redis:
+    image: "redis:alpine"
+    volumes:
+      - redis-data-uapoly-prod:/data:rw
+
+  postgres:
+    image: "postgres:15.2-alpine"
+    environment:
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_DB: "${DB_NAME}"
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data-uapoly-prod:/var/lib/postgresql/data:rw
+
+  app:
+    image: uapoly-prod
+    build: 
+      context: .
+      dockerfile: App.Dockerfile
+    depends_on:
+      - postgres
+      - redis
+    environment:
+        - NODE_ENV=production
+    #   - FORCE_CACHE=1
+
+  nginx:
+    image: uapoly-nginx
+    build: 
+      context: .
+      dockerfile: Nginx.Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    
+
+volumes:
+  db-data-uapoly-prod:
+  redis-data-uapoly-prod:
