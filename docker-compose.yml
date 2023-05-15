@@ -29,7 +29,6 @@ services:
       - redis
     environment:
         - NODE_ENV=production
-    #   - FORCE_CACHE=1
 
   nginx:
     image: uapoly-nginx
